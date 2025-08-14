@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Interactive Light Bulb</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="light-bulb-container"> <!-- New container for just the bulb and its string -->
+        <div class="light-bulb">
+            <div class="bulb-glass"></div>
+            <div class="bulb-base"></div>
+            <div class="pull-string">
+                <div class="pull-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-panel">
+        <div class="control-group">
+            <label for="brightness">Brightness:</label>
+            <input type="range" id="brightness" min="0" max="100" value="100">
+        </div>
+
+        <div class="control-group">
+            <label>Color Temp:</label>
+            <div class="color-options">
+                <button id="color-warm">Warm</button>
+                <button id="color-cool">Cool</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Scene:</label>
+            <div class="scene-options">
+                <button id="scene-day">Day</button>
+                <button id="scene-dusk">Dusk</button>
+                <button id="scene-night">Night</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <button id="power-toggle" class="power-off">Turn On</button>
+        </div>
+    </div>
+
+    <!-- Audio element for sound effect -->
+    <audio id="toggle-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-hand-typewriter-click-1563.mp3" preload="auto"></audio>
+    <!-- REMINDER: You might want to download this sound and place it locally (e.g., 'assets/click.mp3') 
+         and update the 'src' path to ensure it works offline or if Mixkit changes its URL. -->
+
+    <script src="script.js"></script>
+</body>
+</html>

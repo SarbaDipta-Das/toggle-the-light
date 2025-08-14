@@ -1,0 +1,338 @@
+/* Root variables for theme colors */
+:root {
+    /* Backgrounds for different scenes */
+    --bg-day: #eaeaea;
+    --bg-dusk: #778899; /* Slate Gray */
+    --bg-night: #2c3e50; /* Darker blue-gray for night */
+
+    /* Bulb colors for different temperatures */
+    --warm-bulb-color: #ffcc80; /* Warm yellowish/orange */
+    --warm-filament-color: #ffeb3b; /* Brighter yellow for filament when on */
+    --cool-bulb-color: #c2e0ff; /* Cool bluish/white */
+    --cool-filament-color: #e0f2ff; /* Brighter cool white for filament */
+
+    /* Control Panel colors */
+    --panel-bg: rgba(0,0,0,0.4);
+    --panel-text-color: #eee;
+    --button-border-color: #007bff;
+    --button-text-color: #007bff;
+    --button-active-bg: #007bff;
+    --button-active-text: white;
+    --slider-track-color: #ccc;
+    --slider-thumb-color: #4CAF50;
+
+    /* Dynamic Variables (controlled by JS) */
+    --current-bg: var(--bg-day); /* Default scene is day */
+    --brightness: 0; /* Initial brightness for off state (0 to 1) */
+    --current-bulb-color: var(--warm-bulb-color); /* Default color mode: warm */
+    --current-filament-color: var(--warm-filament-color);
+
+    --bulb-color-off: #f0f0f0; /* Default bulb color when light is off */
+    --base-color: #a0a0a0;
+    --string-color: #555;
+    --dot-color: #333;
+}
+
+/* Body styles for full page layout and overall theme */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column; /* Main layout is column */
+    align-items: center;
+    justify-content: space-between; /* Pushes bulb container to top, controls to bottom */
+    background: var(--current-bg); /* Dynamic background */
+    margin: 0;
+    padding: 20px; /* Padding for top/bottom content */
+    box-sizing: border-box; /* Include padding in height */
+    overflow: hidden; /* Prevent scrollbars */
+    transition: background 0.5s ease-in-out; /* Smooth background transition */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #555; /* Default text color for light backgrounds */
+}
+
+/* Light background text color override for better contrast */
+body.scene-day {
+    color: #555;
+}
+body.scene-dusk, body.scene-night {
+    color: var(--panel-text-color); /* Use panel text color for dark scenes */
+}
+
+/* New container for positioning the light bulb at the top */
+.light-bulb-container {
+    display: flex;
+    align-items: flex-start; /* Align bulb to the top within its flex container */
+    justify-content: center;
+    width: 100%;
+    flex-grow: 1; /* Allows it to take up available space, pushing controls down */
+    padding-top: 5vmin; /* Add some space from the top of the viewport */
+    position: relative; /* For the pull string */
+}
+
+/* Light Bulb Styling - no changes from previous version */
+.light-bulb {
+    width: 20vmin;
+    height: 30vmin;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.bulb-glass {
+    width: 100%;
+    height: 70%;
+    background-color: var(--bulb-color-off);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    border: 2px solid #666;
+    box-sizing: border-box;
+    position: relative;
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.bulb-glass::before {
+    content: '';
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.bulb-base {
+    width: 30%;
+    height: 15%;
+    background-color: var(--base-color);
+    border: 2px solid #555;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+}
+
+.pull-string {
+    width: 2px;
+    height: 15vmin;
+    background-color: var(--string-color);
+    position: absolute;
+    bottom: -15vmin;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 0;
+    transition: transform 0.1s ease-out;
+}
+
+.pull-string.pulled {
+    transform: translateX(-50%) translateY(5px);
+}
+
+.pull-dot {
+    width: 1.5vmin;
+    height: 1.5vmin;
+    background-color: var(--dot-color);
+    border-radius: 50%;
+    position: absolute;
+    bottom: -0.75vmin;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1px solid #666;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+
+/* Styles when the light is ON (applied to body) */
+body.light-on .bulb-glass {
+    background-color: var(--current-bulb-color);
+    /* Dynamic glow based on brightness variable */
+    box-shadow: 0 0 calc(20px * var(--brightness)) calc(5px * var(--brightness)) rgba(255, 255, 194, calc(0.7 * var(--brightness))),
+                0 0 calc(40px * var(--brightness)) calc(10px * var(--brightness)) rgba(255, 255, 194, calc(0.5 * var(--brightness)));
+}
+
+body.light-on .bulb-glass::before {
+    background-color: var(--current-filament-color);
+    /* Dynamic filament glow based on brightness variable */
+    box-shadow: inset 0 0 calc(10px * var(--brightness)) rgba(255, 255, 255, calc(0.8 * var(--brightness))),
+                0 0 calc(15px * var(--brightness)) rgba(255, 255, 255, calc(0.6 * var(--brightness)));
+}
+
+
+/* Controls Panel Styling */
+.controls-panel {
+    display: flex;
+    flex-wrap: wrap; /* Allows groups to wrap onto next line */
+    justify-content: center; /* Centers the content within the panel */
+    align-items: center;
+    gap: 20px 20px; /* Vertical and horizontal gap between control groups */
+    padding: 25px 30px;
+    background-color: var(--panel-bg);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    color: var(--panel-text-color);
+    max-width: 600px; /* Limit max width for desktop */
+    width: 90%; /* Responsive width */
+    box-sizing: border-box;
+    margin-top: auto; /* Pushes panel to the bottom of the body */
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align labels to the left */
+    gap: 10px;
+    /* Removed flex:1 and min-width to allow for precise width control in media queries */
+}
+
+.controls-panel label {
+    font-weight: bold;
+    white-space: nowrap; /* Prevent label from wrapping */
+}
+
+/* Slider Styling - no changes needed */
+#brightness {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 10px;
+    background: var(--slider-track-color);
+    outline: none;
+    border-radius: 5px;
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+#brightness::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--slider-thumb-color);
+    cursor: grab;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border: 2px solid white;
+}
+
+#brightness::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--slider-thumb-color);
+    cursor: grab;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border: 2px solid white;
+}
+
+/* Button Group Styling (Color and Scene Options) */
+.color-options, .scene-options {
+    display: flex;
+    gap: 10px;
+    width: 100%; /* Ensure these containers fill their parent control-group */
+}
+
+/* Precision for button widths to make them fit perfectly */
+.color-options button {
+    flex: 0 0 calc(50% - 5px); /* flex-grow:0, flex-shrink:0, flex-basis: calculated width */
+    padding: 10px 15px;
+    border: 1px solid var(--button-border-color);
+    background-color: transparent;
+    color: var(--button-text-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9em;
+}
+
+.scene-options button {
+    flex: 0 0 calc(33.333% - 6.666px); /* flex-grow:0, flex-shrink:0, flex-basis: calculated width */
+    padding: 10px 15px;
+    border: 1px solid var(--button-border-color);
+    background-color: transparent;
+    color: var(--button-text-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9em;
+}
+
+/* Active and Hover States for Buttons - no changes needed */
+.color-options button:hover, .scene-options button:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.color-options button.active, .scene-options button.active {
+    background-color: var(--button-active-bg);
+    color: var(--button-active-text);
+    box-shadow: 0 3px 8px rgba(0, 123, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Power Toggle Button - no changes needed */
+#power-toggle {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    margin-top: 10px;
+}
+
+#power-toggle.power-on {
+    background-color: #28a745;
+    color: white;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.5);
+}
+
+#power-toggle.power-off {
+    background-color: #dc3545;
+    color: white;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.5);
+}
+
+
+/* --- Responsive Layout for Control Panel --- */
+@media (min-width: 550px) { /* On wider screens, arrange controls into rows */
+    .controls-panel {
+        /* On wider screens, center the panel itself, but let its children determine their own distribution */
+        justify-content: center;
+        /* Ensure the panel takes up a reasonable maximum width so elements inside don't spread too thin */
+        max-width: 600px;
+        width: 90%; /* Still responsive */
+    }
+
+    /* Force the brightness and power toggle to be full width within the panel */
+    .controls-panel > .control-group:nth-child(1), /* Brightness */
+    .controls-panel > .control-group:nth-child(4) { /* Power Toggle */
+        width: 100%;
+        flex: none; /* Do not grow/shrink based on flex:1 */
+    }
+
+    /* Distribute Color Temp and Scene groups evenly on one row */
+    .controls-panel > .control-group:nth-child(2), /* Color Temp */
+    .controls-panel > .control-group:nth-child(3) { /* Scene */
+        width: calc(50% - 10px); /* Take half the width, accounting for the 20px horizontal gap between them */
+        flex: none; /* Do not grow/shrink based on flex:1 */
+    }
+}
+
+@media (max-width: 549px) { /* On smaller screens, stack all control groups vertically */
+    .controls-panel {
+        flex-direction: column; /* Stack controls vertically */
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .control-group {
+        width: 100%; /* Each group takes full width */
+        flex: none; /* No flex growing/shrinking for groups */
+    }
+    /* Buttons within these groups will still use their flex-basis calculations */
+}
